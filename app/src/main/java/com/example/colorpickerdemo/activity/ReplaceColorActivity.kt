@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.colorpickerdemo.Contants.Constants.CAMERA_REQUEST_CODE
 import com.example.colorpickerdemo.Contants.Constants.PICK_IMAGE_REQUEST
 import com.example.colorpickerdemo.R
+import com.example.colorpickerdemo.databinding.ActivityReplaceColorBinding
 import com.example.colorpickerdemo.viewmodel.ColorPickerViewModel
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -29,15 +30,8 @@ import kotlin.math.roundToInt
 
 class ReplaceColorActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityReplaceColorBinding
     private lateinit var viewModel: ColorPickerViewModel
-    private lateinit var imageView: ImageView
-    private lateinit var imageColor: ImageView
-    private lateinit var buttonOpenGallery: Button
-    private lateinit var buttonOpenCamera: Button
-    private lateinit var pointer: ImageView
-    private lateinit var textViewRGB: TextView
-    private lateinit var textViewHSV: TextView
-    private lateinit var textViewColor: TextView
 
     private var scaleGestureDetector: ScaleGestureDetector? = null
     private var scaleFactor = 1.0f
@@ -45,27 +39,22 @@ class ReplaceColorActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_replace_color)
+        binding = ActivityReplaceColorBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         viewModel = ViewModelProvider(this).get(ColorPickerViewModel::class.java)
-        imageView = findViewById(R.id.imageView)
-        textViewColor = findViewById(R.id.textViewColor)
-        buttonOpenGallery = findViewById(R.id.buttonOpenGallery)
-        buttonOpenCamera = findViewById(R.id.button_open_camera)
-        scaleGestureDetector = ScaleGestureDetector(this, ScaleListener())
-        imageColor = findViewById(R.id.imageColor)
-        pointer = findViewById(R.id.pointer)
-        pointer.setImageResource(R.drawable.pointer)
 
-        buttonOpenGallery.setOnClickListener {
+        scaleGestureDetector = ScaleGestureDetector(this, ScaleListener())
+
+        binding.buttonOpenGallery.setOnClickListener {
             openGallery()
         }
-        buttonOpenCamera.setOnClickListener {
+        binding.buttonOpenCamera.setOnClickListener {
             openCamera()
         }
         observeViewModel()
 
-        imageView.setOnTouchListener { _, event ->
+        binding.imageView.setOnTouchListener { _, event ->
             handleTouch(event)
             true
         }
@@ -76,7 +65,7 @@ class ReplaceColorActivity : AppCompatActivity() {
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
                 val x = event.x.toInt()
                 val y = event.y.toInt()
-                if (x in 0 until imageView.width && y in 0 until imageView.height) {
+                if (x in 0 until binding.imageView.width && y in 0 until binding.imageView.height) {
                     val pixel = getPixelColorFromImage(event)
                     updateTextViewPixel(pixel)
                 }
@@ -87,7 +76,7 @@ class ReplaceColorActivity : AppCompatActivity() {
     }
 
     private fun getPixelColorFromImage(event: MotionEvent): Int {
-        val bitmap: Bitmap = getBitmapFromView(imageView)
+        val bitmap: Bitmap = getBitmapFromView(binding.imageView)
         return bitmap.getPixel(event.x.toInt(), event.y.toInt())
     }
 
@@ -95,17 +84,12 @@ class ReplaceColorActivity : AppCompatActivity() {
         val red = Color.red(pixel)
         val green = Color.green(pixel)
         val blue = Color.blue(pixel)
-        val hex = Integer.toHexString(pixel)
         val hsv = FloatArray(3)
         Color.RGBToHSV(red, green, blue, hsv)
         val hue = round(hsv[0], 3)
-        val saturation = round(hsv[1], 3)
-        val value = round(hsv[2], 3)
-        imageColor.setBackgroundColor(Color.rgb(red, green, blue))
-        textViewRGB.text = "RGB: red:$red green:$green blue:$blue"
-        textViewHSV.text = "HSV: hue:$hue saturation:$saturation value:$value"
+        binding.imageColor.setBackgroundColor(Color.rgb(red, green, blue))
         val colorName = getColorName(hue)
-        textViewColor.text = " $colorName"
+        binding.textViewColor.text = " $colorName"
     }
 
 
@@ -143,7 +127,7 @@ class ReplaceColorActivity : AppCompatActivity() {
 
     private fun observeViewModel() {
         viewModel.selectedImageUrl.observe(this) { imageUrl ->
-            imageView.setImageURI(Uri.parse(imageUrl))
+            binding.imageView.setImageURI(Uri.parse(imageUrl))
         }
     }
 
@@ -177,7 +161,7 @@ class ReplaceColorActivity : AppCompatActivity() {
         try {
             val imageBitmap: Bitmap =
                 MediaStore.Images.Media.getBitmap(this.contentResolver, selectedImageUri)
-            imageView.setImageBitmap(imageBitmap)
+            binding.imageView.setImageBitmap(imageBitmap)
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -187,8 +171,8 @@ class ReplaceColorActivity : AppCompatActivity() {
         override fun onScale(detector: ScaleGestureDetector): Boolean {
             scaleFactor *= detector.scaleFactor
             scaleFactor = 0.1f.coerceAtLeast(scaleFactor.coerceAtMost(5.0f))
-            imageView.scaleX = scaleFactor
-            imageView.scaleY = scaleFactor
+            binding.imageView.scaleX = scaleFactor
+            binding.imageView.scaleY = scaleFactor
             return true
         }
     }
