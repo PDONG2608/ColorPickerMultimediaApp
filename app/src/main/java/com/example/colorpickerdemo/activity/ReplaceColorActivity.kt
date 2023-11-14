@@ -27,7 +27,7 @@ import java.io.IOException
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
-class ColorPickerActivity : AppCompatActivity() {
+class ReplaceColorActivity : AppCompatActivity() {
 
     private lateinit var viewModel: ColorPickerViewModel
     private lateinit var imageView: ImageView
@@ -45,12 +45,10 @@ class ColorPickerActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_color_picker)
+        setContentView(R.layout.activity_replace_color)
 
         viewModel = ViewModelProvider(this).get(ColorPickerViewModel::class.java)
         imageView = findViewById(R.id.imageView)
-        textViewRGB = findViewById(R.id.textViewRGB)
-        textViewHSV = findViewById(R.id.textViewHSV)
         textViewColor = findViewById(R.id.textViewColor)
         buttonOpenGallery = findViewById(R.id.buttonOpenGallery)
         buttonOpenCamera = findViewById(R.id.button_open_camera)

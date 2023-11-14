@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape>
+            <solid android:color="@color/black" /> <!-- Màu bạn muốn khi nhấn -->
+            <corners android:radius="100dp" /> <!-- Đổi bán kính để bo tròn góc -->
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <solid android:color="@color/white" /> <!-- Màu mặc định khi không nhấn -->
+            <corners android:radius="100dp" /> <!-- Đổi bán kính để bo tròn góc -->
+        </shape>
+    </item>
+</selector>
