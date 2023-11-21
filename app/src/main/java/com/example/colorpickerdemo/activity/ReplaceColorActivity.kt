@@ -14,6 +14,7 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -25,6 +26,8 @@ import com.example.colorpickerdemo.databinding.ActivityReplaceColorBinding
 import com.example.colorpickerdemo.viewmodel.ColorPickerViewModel
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
@@ -61,18 +64,56 @@ class ReplaceColorActivity : AppCompatActivity() {
     }
 
     private fun handleTouch(event: MotionEvent?) {
+        val layoutParams = binding.overlayView.layoutParams as FrameLayout.LayoutParams
         when (event?.action) {
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
                 val x = event.x.toInt()
                 val y = event.y.toInt()
+                showOverlayView(x, y)
+                layoutParams.leftMargin = (x - binding.overlayView.width - dpToPx(100))
+                layoutParams.topMargin = (y - binding.overlayView.height - dpToPx(300))
+                binding.overlayView.layoutParams = layoutParams
+                binding.overlayView.scaleType = ImageView.ScaleType.CENTER_INSIDE
+
+                val bitmapCircle = getBitmapAroundTouchPoint(binding.imageView, event, 200)?.let {
+                    Bitmap.createScaledBitmap(it, it.width * 10, it.height * 10, true)
+                }
+                binding.overlayView.setImageBitmap(bitmapCircle)
                 if (x in 0 until binding.imageView.width && y in 0 until binding.imageView.height) {
                     val pixel = getPixelColorFromImage(event)
                     updateTextViewPixel(pixel)
                 }
             }
 
-            else -> false
+            MotionEvent.ACTION_UP -> {
+                hideOverlay()
+            }
         }
+    }
+
+    private fun getBitmapAroundTouchPoint(imageView: ImageView, event: MotionEvent, radius: Int): Bitmap? {
+        val x = event.x.toInt()
+        val y = event.y.toInt()
+        val bitmap = getBitmapFromView(imageView)
+        val startX = max(0, x - radius)
+        val startY = max(0, y - radius)
+        val endX = min(bitmap.width, x + radius)
+        val endY = min(bitmap.height, y + radius)
+        return Bitmap.createBitmap(bitmap, startX, startY, endX - startX, endY - startY)
+    }
+
+    private fun dpToPx(dp: Int): Int {
+        val density = resources.displayMetrics.density
+        return (dp * density).toInt()
+    }
+
+    private fun showOverlayView(x: Int, y: Int) {
+//        binding.overlayView.updatePositionOverlay(x,y)
+        binding.overlayView.visibility = View.VISIBLE
+    }
+
+    private fun hideOverlay() {
+        binding.overlayView.visibility = View.INVISIBLE
     }
 
     private fun getPixelColorFromImage(event: MotionEvent): Int {

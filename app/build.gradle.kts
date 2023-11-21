@@ -51,8 +51,12 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
-    implementation ("androidx.databinding:databinding-runtime:8.1.3")
+    implementation ("androidx.databinding:databinding-runtime:8.1.4")
     implementation ("com.google.android.material:material:1.10.0")
+
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
+
 
 
 }
